@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Playfair+Display:ital@0;1&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <title>Test</title>
+</head>
+<body>
+    <div class="wikipediaContent" id="wiki">
+
+    </div>
+    <script>
+        let wikiContainer = document.getElementById('wiki');
+        fetch('http://localhost:5000/wikiArticle/CURL')
+        .then(res => res.text())
+        .then(data => wikiContainer.innerHTML = data);
+    </script>
+</body>
+</html>
