@@ -110,7 +110,7 @@ export default class ranRace extends Component{
                         </div>
                     </div>
                 </main>
-                <button className="btn startBtn" onClick={this.printState}>START</button>
+                <button className="btn startBtn" onClick={() => {window.location = `/race?start=${this.state.selectedStart}&target=${this.state.selectedTarget}`}}>START</button>
             </div>
         );
     }

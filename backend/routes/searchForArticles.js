@@ -6,7 +6,7 @@ const baseUrl = "https://de.wikipedia.org/w/api.php"
 
 
 router.route('/:searchTerm').get((req, res) => {
-    let searchTerm = req.params.searchTerm.replace(' ', '_');
+    let searchTerm = encodeURI(req.params.searchTerm.replace(' ', '_'));
     let params = {
         action: "opensearch",
         search: searchTerm,
