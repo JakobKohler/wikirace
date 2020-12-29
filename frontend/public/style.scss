@@ -206,9 +206,6 @@ h1{
 .startContainer{
   max-width: 100%;
 }
-.articleTitle{
-  color: #ffffff;
-}
 #wiki > *{
   font-family: sans-serif;
 }
@@ -228,6 +225,12 @@ h1{
   font-weight: bolder;
   letter-spacing: 3px;
   opacity: .5;
+  color: #fff;
+  svg{
+    max-width: 20px;
+    fill: #fff;
+    cursor: pointer;
+  }
 }
 .articleName{
   font-size: 1.5rem;
@@ -248,7 +251,7 @@ h1{
   height: 250px;
   overflow-y: scroll;
   width: 100%;
-  /*scrollbar-color: rgba(255,255,255,0.2) #262626;*/
+  scrollbar-color: rgba(255,255,255,0.2) #262626;
 }
 .pathItem{
   margin: 0;
@@ -352,4 +355,89 @@ h1{
   display: flex;
   justify-content: center;
   align-items: center;
+}
+.winPopup{
+  position: fixed;
+  width: 100vw;
+  height: 100vh;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: auto;
+  background-color: rgba(0,0,0, 0.5);
+}
+.winPopupContent{
+  position: absolute;
+  background: #181818;
+  width: 40%;
+  height: 60%;
+  top: 50%;
+  left: 50%;
+  margin: auto;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  font-family: Montserrat, sans-serif;
+  h2{
+    font-size: 3rem;
+    letter-spacing: 3px;
+  }
+}
+.winArticleContainer{
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+  svg{
+    width: 40px;
+    fill: rgba(255,255,255,0.25);
+  }
+  .winArticles{
+    font-size: 1.4rem;
+    font-weight: 600;
+    max-width: 250px;
+    overflow-wrap: break-word;
+    hyphens: auto;
+  }
+}
+.winStats{
+  margin-top: 3em;
+  .winStatsItem{
+    width: 40%;
+    margin: 0 auto 1em auto;
+    p{
+      margin: .5em 2em;
+      font-size: 1rem;
+      font-weight: 600;
+      span{
+        font-size: 2.2rem;
+      }
+    }
+  }
+  svg{
+    max-width: 30px;
+    fill: rgba(255,255,255,0.25);
+  }
+}
+.closeBtn{
+  width: 30px;
+  fill: rgba(255,255,255,0.25);
+  position: absolute;
+  top: 0;
+  left: 100%;
+  transform: translateX(calc(-100% - 8px));
+  cursor: pointer
+}
+.cancelBtn{
+  width: 100%;
+  button{
+    font-family: Montserrat, sans-serif;
+    font-size: 1.4rem;
+    background: none;
+    border: solid 2px rgba(255,255,255,0.25);
+    width: 100%;
+    color: rgba(255,255,255,0.25);
+    display: block;
+    padding: .5em 1em;
+    cursor: pointer;
+  }
 }
