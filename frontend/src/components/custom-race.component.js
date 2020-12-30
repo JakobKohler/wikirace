@@ -9,7 +9,7 @@ export default class ranRace extends Component{
             startSearchResults: [],
             targetSearchResults: [],
             selectedStart: '',
-            selectedTarget: ''
+            selectedTarget: '',
         }
 
         this.handleArticleClick = this.handleArticleClick.bind(this);
@@ -58,6 +58,7 @@ export default class ranRace extends Component{
     }
 
     render() {
+        let enableStart = Boolean(this.state.selectedStart) && Boolean(this.state.selectedTarget) && this.state.selectedStart !== this.state.selectedTarget;
         return(
             <div className="wrapper">
                 <h2 className="titleSub">Custom Race</h2>
@@ -95,7 +96,7 @@ export default class ranRace extends Component{
                         </div>
                     </div>
                 </main>
-                <button className="btn startBtn" onClick={() => {window.location = `/race?start=${this.state.selectedStart}&target=${this.state.selectedTarget}`}}>START</button>
+                {enableStart ? <button className="btn startBtn" onClick={() => {window.location = `/race?start=${this.state.selectedStart}&target=${this.state.selectedTarget}`}}>START</button> : null}
             </div>
         );
     }

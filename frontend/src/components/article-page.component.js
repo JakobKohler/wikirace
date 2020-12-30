@@ -157,6 +157,7 @@ export default class raceInterface extends Component{
             });
     }
     changeWikiPage(str){
+        /*FIXME Make recyclable fetch function*/
         const linkRegex = /(?<=\/wiki\/).*/g;
         let link = str.match(linkRegex)[0];
         let decodedLink = decodeURI(link).replace(/_/g, ' ');
@@ -212,7 +213,7 @@ export default class raceInterface extends Component{
             loading: true,
             previewToggle: !this.state.previewToggle
         });
-        axios.get('http://localhost:5000/wikiArticle/' + targetArticle)
+        axios.get('http://localhost:5000/wikiArticle/' + encodeURIComponent(targetArticle))
             .then((res) => {
                 this.setState({
                     loading: false,
@@ -222,7 +223,7 @@ export default class raceInterface extends Component{
     }
     scrollToId(targetId){
         let embedWrapper = document.querySelector('html-embed');
-        embedWrapper.shadowRoot.getElementById(targetId.substr(1)).scrollIntoView({behavior: "smooth"})
+        embedWrapper.shadowRoot.getElementById(targetId.substr(1)).scrollIntoView({behavior: "smooth"});
     }
     render() {
         const {wikipediaJSX, loading, showWinPopup} = this.state;
@@ -306,4 +307,5 @@ export default class raceInterface extends Component{
         );
     }
 }
-/*refactor article fetching*/
+/*TODO Add loading timeout and 404 fallback and error handler*/
+/*TODO Check for redirections of article*/

@@ -67,6 +67,7 @@ export default class ranRace extends Component{
     }
 
     render() {
+        let enableStart = Boolean(this.state.selectedStart) && Boolean(this.state.selectedTarget) && this.state.selectedStart !== this.state.selectedTarget;
         return(
             <div className="wrapper">
                 <h2 className="titleSub">Random Race</h2>
@@ -110,7 +111,7 @@ export default class ranRace extends Component{
                         </div>
                     </div>
                 </main>
-                <button className="btn startBtn" onClick={() => {window.location = `/race?start=${this.state.selectedStart}&target=${this.state.selectedTarget}`}}>START</button>
+                {enableStart ? <button className="btn startBtn" onClick={() => {window.location = `/race?start=${this.state.selectedStart}&target=${this.state.selectedTarget}`}}>START</button> : null}
             </div>
         );
     }
