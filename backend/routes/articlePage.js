@@ -4,7 +4,7 @@ const axios = require('axios');
 
 router.route('/:article').get((req, res) => {
     let article = req.params.article.replace(' ', '_');
-    let customUrl = encodeURI(baseUrl + article);
+    let customUrl = baseUrl + encodeURIComponent(decodeURIComponent(article));
 
     let requestConfig = {
         method: 'get',
@@ -15,13 +15,8 @@ router.route('/:article').get((req, res) => {
     };
     axios(requestConfig)
         .then(apires => {
-            editHtml(apires.data);
+            res.send(apires.data);
         })
-        .catch(err => console.log(err));
-
-    function editHtml(htmlCode) {
-        res.send(htmlCode);
-    }
-
+        .catch(err => res.send('<p>Hello</p>'));
 });
 module.exports = router;

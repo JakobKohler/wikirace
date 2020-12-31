@@ -65,6 +65,24 @@ export default class ranRace extends Component{
     printState(){
         console.log(this.state);
     }
+    checkRedirects(article, targetArticle, callbackFunction){
+        console.log(article, targetArticle);
+        axios.get('http://localhost:5000/getRedirects/' + encodeURI(article))
+            .then(apires => {
+                axios.get('http://localhost:5000/getRedirects/' + encodeURIComponent(decodeURIComponent(targetArticle)))
+                    .then(targetRes => {
+                        callbackFunction(!(Boolean(apires.data.includes(targetArticle) ||targetRes.data.includes(article) || Boolean(apires.data.some(item => targetRes.data.includes(item))))));
+                        return !(Boolean(apires.data.includes(targetArticle) ||targetRes.data.includes(article) || Boolean(apires.data.some(item => targetRes.data.includes(item)))));
+                    });
+            });
+        return true;
+    }
+    handleStartClick() {
+        this.checkRedirects(this.state.selectedStart, this.state.selectedTarget, (res) => this.checkBoolRedirect(res))
+    }
+    checkBoolRedirect(res){
+        if (res) window.location = `/race?start=${this.state.selectedStart}&target=${this.state.selectedTarget}`;
+    }
 
     render() {
         let enableStart = Boolean(this.state.selectedStart) && Boolean(this.state.selectedTarget) && this.state.selectedStart !== this.state.selectedTarget;
@@ -111,7 +129,7 @@ export default class ranRace extends Component{
                         </div>
                     </div>
                 </main>
-                {enableStart ? <button className="btn startBtn" onClick={() => {window.location = `/race?start=${this.state.selectedStart}&target=${this.state.selectedTarget}`}}>START</button> : null}
+                {enableStart ? <button className="btn startBtn" onClick={() => this.handleStartClick()}>START</button> : null}
             </div>
         );
     }

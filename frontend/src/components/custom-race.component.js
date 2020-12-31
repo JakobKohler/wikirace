@@ -13,7 +13,6 @@ export default class ranRace extends Component{
         }
 
         this.handleArticleClick = this.handleArticleClick.bind(this);
-        this.printState = this.printState.bind(this);
     }
 
     onChangeInput(ev, list){
@@ -53,12 +52,30 @@ export default class ranRace extends Component{
             });
         }
     }
-    printState(){
-        console.log(this.state);
+    checkRedirects(article, targetArticle, callbackFunction){
+        console.log(article, targetArticle);
+        axios.get('http://localhost:5000/getRedirects/' + encodeURI(article))
+            .then(apires => {
+                axios.get('http://localhost:5000/getRedirects/' + encodeURIComponent(decodeURIComponent(targetArticle)))
+                    .then(targetRes => {
+                        callbackFunction(!(Boolean(apires.data.includes(targetArticle) ||targetRes.data.includes(article) || Boolean(apires.data.some(item => targetRes.data.includes(item))))));
+                        return !(Boolean(apires.data.includes(targetArticle) ||targetRes.data.includes(article) || Boolean(apires.data.some(item => targetRes.data.includes(item)))));
+                    });
+            });
+        return true;
+    }
+    handleStartClick() {
+        this.checkRedirects(this.state.selectedStart, this.state.selectedTarget, (res) => this.checkBoolRedirect(res))
+    }
+    checkBoolRedirect(res){
+        if (res) window.location = `/race?start=${this.state.selectedStart}&target=${this.state.selectedTarget}`;
     }
 
+
     render() {
-        let enableStart = Boolean(this.state.selectedStart) && Boolean(this.state.selectedTarget) && this.state.selectedStart !== this.state.selectedTarget;
+        let start = this.state.selectedStart;
+        let target = this.state.selectedTarget;
+        let enableStart = Boolean(start) && Boolean(target) && start !== target;
         return(
             <div className="wrapper">
                 <h2 className="titleSub">Custom Race</h2>
@@ -96,8 +113,9 @@ export default class ranRace extends Component{
                         </div>
                     </div>
                 </main>
-                {enableStart ? <button className="btn startBtn" onClick={() => {window.location = `/race?start=${this.state.selectedStart}&target=${this.state.selectedTarget}`}}>START</button> : null}
+                {enableStart ? <button className="btn startBtn" onClick={() => this.handleStartClick()}>START</button> : null}
             </div>
         );
     }
 }
+/*TODO fix input validation (check on submit)*/

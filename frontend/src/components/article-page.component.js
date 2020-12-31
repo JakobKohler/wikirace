@@ -70,6 +70,7 @@ class WebWrapper extends Component{
         let initialDom = new DOMParser().parseFromString(htmlString, 'text/html');
         let newDocWrapper = new DOMParser().parseFromString('<html lang="en"> <head> <title>iFrame Wikipedia</title><style>body{overflow-y: visible !important;} #content{margin-left: 0; overflow-x: hidden}a:link, a:visited, a {color: #0645ad !important;} a.external, a:not(.clickableLink){text-decoration: line-through !important; color: #4a4a4a !important;}</style></head> <body> </body></html>', 'text/html');
         let contentDiv = initialDom.getElementById('content');
+        if (!contentDiv) return '<p>Error</p>'
         newDocWrapper.querySelector('body').appendChild(contentDiv);
 
         let cssLinks = initialDom.querySelectorAll('link[rel=stylesheet]');
@@ -92,7 +93,7 @@ class WebWrapper extends Component{
             if (hrefVal.includes('/wiki/')){
                 currentAnchor.setAttribute('inter-link', hrefVal);
                 currentAnchor.setAttribute('class', 'interWikiLink clickableLink');
-            }else if (hrefVal.charAt(0) === '#'){
+            }else if (hrefVal.charAt(0) === '#' && !currentAnchor.classList.contains('mw-jump-link')){
                 currentAnchor.setAttribute('scroll-link', hrefVal);
                 currentAnchor.setAttribute('class', 'scrollLink clickableLink');
             }
@@ -128,6 +129,7 @@ export default class raceInterface extends Component{
             clickCounter: 0,
             currentTime: 0,
             trace: [],
+            allRedirects: [],
             finished: false,
             showWinPopup: false,
             previewToggle: false
@@ -149,15 +151,21 @@ export default class raceInterface extends Component{
         });
         axios.get('http://localhost:5000/wikiArticle/'+ encodeURIComponent(decodedParams.start))
             .then((res) => {
+                this.fetchRedirects(res.data, decodedParams.target);
+            }).catch(err => console.log(err));
+    }
+    fetchRedirects(wikiJsx, target){
+        axios.get('http://localhost:5000/getRedirects/'+ encodeURIComponent(target))
+            .then((res) => {
                 this.startTimer();
                 this.setState({
-                    wikipediaJSX: res.data,
+                    wikipediaJSX: wikiJsx,
                     loading: false,
+                    allRedirects: res.data
                 });
-            });
+            }).catch(err => console.log(err));
     }
     changeWikiPage(str){
-        /*FIXME Make recyclable fetch function*/
         const linkRegex = /(?<=\/wiki\/).*/g;
         let link = str.match(linkRegex)[0];
         let decodedLink = decodeURI(link).replace(/_/g, ' ');
@@ -166,24 +174,22 @@ export default class raceInterface extends Component{
             return {
                 loading: true,
                 clickCounter: prevState.clickCounter + 1,
-                finished: decodedLink === this.state.targetArticle
+                finished: decodedLink === this.state.targetArticle || this.state.allRedirects.includes(decodedLink)
             };
         });
         axios.get('http://localhost:5000/wikiArticle/'+ encodeURIComponent(link))
             .then((res) => {
-                console.log('Done fetching');
                 this.setState({
                     wikipediaJSX: res.data,
                     loading: false,
                     currentArticle: decodedLink,
                     trace: [decodedLink, ...this.state.trace],
-                    showWinPopup: decodedLink === this.state.targetArticle
+                    showWinPopup: decodedLink === this.state.targetArticle || this.state.allRedirects.includes(decodedLink)
                 });
-                this.state.finished ? this.displayWin() : this.startTimer();
-            });
-    }
-    displayWin(){
-        console.log('WIN');
+                if (!this.state.finished){
+                    this.startTimer();
+                }
+            }).catch(err => console.log(err));
     }
     removeWin(){
         this.setState({
@@ -276,9 +282,10 @@ export default class raceInterface extends Component{
                         <p className="articleTitle">ZIEL
                             <svg onClick={this.previewTarget} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M256 8C119.043 8 8 119.083 8 256c0 136.997 111.043 248 248 248s248-111.003 248-248C504 119.083 392.957 8 256 8zm0 110c23.196 0 42 18.804 42 42s-18.804 42-42 42-42-18.804-42-42 18.804-42 42-42zm56 254c0 6.627-5.373 12-12 12h-88c-6.627 0-12-5.373-12-12v-24c0-6.627 5.373-12 12-12h12v-64h-12c-6.627 0-12-5.373-12-12v-24c0-6.627 5.373-12 12-12h64c6.627 0 12 5.373 12 12v100h12c6.627 0 12 5.373 12 12v24z"/></svg></p>
                         <h2 className="articleName" id='targetDisplay'>{this.state.targetArticle}</h2>
+                        <p className='redirects'>{this.state.allRedirects.join(', ')}</p>
                     </div>
                 </div>
-                <div className="wikipediaContent" id="wiki">
+                <div className={this.state.previewToggle ? 'wikipediaContent previewBorder' : 'wikipediaContent'} id="wiki">
                     {loading ? <LoadingComponent />: <WebWrapper htmlCode={wikipediaJSX} changeWikiPage={this.changeWikiPage} deactivateListener={this.state.finished || this.state.previewToggle} scrollToId={this.scrollToId}/>}
                     {showWinPopup ? <WinPopup removeWin={this.removeWin} stats={this.state} secondsToTime={this.secondsToTime}/> : null}
                 </div>
@@ -290,8 +297,8 @@ export default class raceInterface extends Component{
                     <div className="pathContainer">
                         <p className="articleTitle">Weg</p>
                         <div className="itemContainer" lang='de'>
-                            {this.state.trace.map((traceItem) => {
-                                return <p className='pathItem' key={btoa(traceItem)}> {traceItem} </p>;
+                            {this.state.trace.map((traceItem,index) => {
+                                return <p className='pathItem' key={traceItem + index.toString()}> {traceItem} </p>;
                             })}
                         </div>
                     </div>
@@ -308,4 +315,4 @@ export default class raceInterface extends Component{
     }
 }
 /*TODO Add loading timeout and 404 fallback and error handler*/
-/*TODO Check for redirections of article*/
+/*TODO Maybe add image preview ? */

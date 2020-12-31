@@ -12,6 +12,7 @@ export default class HtmlEmbedWebComponent extends HTMLElement {
     }
     handleClick(ev){
         if (ev.target.classList.contains('interWikiLink')){
+            console.log(ev.target.getAttribute("inter-link"));
             ev.target.dispatchEvent(new CustomEvent('interLinkClick', {
                 bubbles: true,
                 composed: true,
